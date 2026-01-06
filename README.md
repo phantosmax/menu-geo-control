@@ -1,4 +1,4 @@
-![Banner](./.github/banner.png)
+![Banner](./.github/menu-geo-control-banner.png)
 # Menu Geo Control - WordPress Plugin
 
 A WordPress plugin that adds country-based visibility controls to WordPress menu items.
