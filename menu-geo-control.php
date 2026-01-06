@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: Menu Geo Control
- * Plugin URI: https://phantosmax.com
+ * Plugin URI: https://phantosmax.github.io/wordpress-geo-menu-control/
  * Description: Show or hide menu items based on visitor's country
  * Version: 1.0.0
  * Author: Phantosmax
- * Author URI: https://phantosmax.com
+ * Author URI: https://phantosmax.github.io
  * License: GPL v2 or later
  * Text Domain: menu-geo-control
  */

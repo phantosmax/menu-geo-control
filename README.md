@@ -1,3 +1,4 @@
+![Banner](./.github/banner.png)
 # Menu Geo Control - WordPress Plugin
 
 A WordPress plugin that adds country-based visibility controls to WordPress menu items.
@@ -293,7 +294,7 @@ All link to different pages with regional contact info.
 
 ## Support
 
-For issues specific to Phantosmax implementations, contact your development team.
+No Support
 
 For WordPress menu system questions, visit WordPress documentation.
 
