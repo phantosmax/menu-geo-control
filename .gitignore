@@ -1,8 +1,0 @@
-# Claude Code directory
-.claude
-
-# macOS
-.DS_Store
-
-# WordPress
-wp-config.php
