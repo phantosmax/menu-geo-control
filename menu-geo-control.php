@@ -30,19 +30,74 @@ class Menu_Geo_Control {
     private function __construct() {
         // Add custom fields to menu items
         add_action('wp_nav_menu_item_custom_fields', array($this, 'add_menu_item_fields'), 10, 2);
-        
+
         // Save menu item custom fields
         add_action('wp_update_nav_menu_item', array($this, 'save_menu_item_fields'), 10, 2);
-        
+
         // Filter menu items based on geo targeting
         add_filter('wp_nav_menu_objects', array($this, 'filter_menu_items'), 10, 2);
-        
+
         // Add admin menu
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_init', array($this, 'register_settings'));
-        
+
         // Add custom CSS to admin
         add_action('admin_head-nav-menus.php', array($this, 'admin_menu_css'));
+
+        // Prevent page caching for geo-targeted content
+        add_action('send_headers', array($this, 'send_nocache_headers'));
+        add_action('init', array($this, 'disable_page_caching'));
+    }
+
+    /**
+     * Send no-cache headers to prevent browser caching
+     */
+    public function send_nocache_headers() {
+        if (is_admin()) {
+            return;
+        }
+
+        header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
+        header('Pragma: no-cache');
+        header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
+        header('Vary: X-Forwarded-For');
+    }
+
+    /**
+     * Disable page caching for popular caching plugins
+     */
+    public function disable_page_caching() {
+        if (is_admin()) {
+            return;
+        }
+
+        // WP Super Cache
+        if (!defined('DONOTCACHEPAGE')) {
+            define('DONOTCACHEPAGE', true);
+        }
+
+        // W3 Total Cache
+        if (!defined('DONOTCACHEDB')) {
+            define('DONOTCACHEDB', true);
+        }
+        if (!defined('DONOTCACHEOBJECT')) {
+            define('DONOTCACHEOBJECT', true);
+        }
+
+        // WP Rocket
+        if (!defined('DONOTROCKETOPTIMIZE')) {
+            define('DONOTROCKETOPTIMIZE', true);
+        }
+
+        // LiteSpeed Cache
+        if (!defined('LSCACHE_NO_CACHE')) {
+            define('LSCACHE_NO_CACHE', true);
+        }
+
+        // Comet Cache
+        if (!defined('COMET_CACHE_ALLOWED')) {
+            define('COMET_CACHE_ALLOWED', false);
+        }
     }
     
     /**
