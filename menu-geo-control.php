@@ -3,7 +3,7 @@
  * Plugin Name: Menu Geo Control
  * Plugin URI: https://phantosmax.github.io/wordpress-geo-menu-control/
  * Description: Show or hide menu items based on visitor's country
- * Version: 1.0.2
+ * Version: 1.0.3
  * Author: Phantosmax
  * Author URI: https://phantosmax.github.io
  * License: GPL v2 or later
@@ -111,21 +111,13 @@ class Menu_Geo_Control {
         if (is_admin()) {
             return;
         }
-        ?>
-        <script>
-        (function() {
-            window.addEventListener('pageshow', function(event) {
-                if (event.persisted) {
-                    window.location.reload();
-                }
-            });
 
-            if (window.performance && window.performance.navigation.type === 2) {
-                window.location.reload();
-            }
-        })();
-        </script>
-        <?php
+        wp_register_script('mgc-bfcache', false, array(), '1.0.2', true);
+        wp_enqueue_script('mgc-bfcache');
+        wp_add_inline_script('mgc-bfcache',
+            'window.addEventListener("pageshow",function(e){if(e.persisted){window.location.reload();}});' .
+            'if(window.performance&&window.performance.navigation.type===2){window.location.reload();}'
+        );
     }
 
     /**
@@ -604,12 +596,20 @@ class Menu_Geo_Control {
             
             <h3>Clear Cache</h3>
             <p>Country detection results are cached for 24 hours. To clear the cache:</p>
-            <button type="button" class="button" onclick="if(confirm('Clear all geo-location cache?')) { location.href='<?php echo admin_url('options-general.php?page=menu-geo-control&clear_cache=1'); ?>'; }">Clear Cache</button>
-            
             <?php
-            if (isset($_GET['clear_cache']) && $_GET['clear_cache'] == '1') {
+            $clear_url = wp_nonce_url(admin_url('options-general.php?page=menu-geo-control&clear_cache=1'), 'mgc_clear_cache');
+            ?>
+            <button type="button" class="button" onclick="if(confirm('Clear all geo-location cache?')) { location.href='<?php echo esc_url($clear_url); ?>'; }">Clear Cache</button>
+
+            <?php
+            if (isset($_GET['clear_cache']) && check_admin_referer('mgc_clear_cache')) {
                 global $wpdb;
-                $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_mgc_country_%' OR option_name LIKE '_transient_timeout_mgc_country_%'");
+                $table = $wpdb->options;
+                $wpdb->query($wpdb->prepare(
+                    "DELETE FROM {$table} WHERE option_name LIKE %s OR option_name LIKE %s",
+                    '_transient_mgc_country_%',
+                    '_transient_timeout_mgc_country_%'
+                ));
                 echo '<div class="notice notice-success"><p>Cache cleared successfully!</p></div>';
             }
             ?>
