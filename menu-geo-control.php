@@ -3,7 +3,7 @@
  * Plugin Name: Menu Geo Control
  * Plugin URI: https://phantosmax.github.io/wordpress-geo-menu-control/
  * Description: Show or hide menu items based on visitor's country
- * Version: 1.0.0
+ * Version: 1.0.2
  * Author: Phantosmax
  * Author URI: https://phantosmax.github.io
  * License: GPL v2 or later
@@ -47,6 +47,9 @@ class Menu_Geo_Control {
         // Prevent page caching for geo-targeted content
         add_action('send_headers', array($this, 'send_nocache_headers'));
         add_action('init', array($this, 'disable_page_caching'));
+
+        // Add JavaScript to handle browser back/forward cache
+        add_action('wp_footer', array($this, 'add_bfcache_handler'));
     }
 
     /**
@@ -99,7 +102,32 @@ class Menu_Geo_Control {
             define('COMET_CACHE_ALLOWED', false);
         }
     }
-    
+
+    /**
+     * Add JavaScript to handle browser back/forward cache (bfcache)
+     * Forces page reload when restored from bfcache to ensure correct geo-targeted content
+     */
+    public function add_bfcache_handler() {
+        if (is_admin()) {
+            return;
+        }
+        ?>
+        <script>
+        (function() {
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    window.location.reload();
+                }
+            });
+
+            if (window.performance && window.performance.navigation.type === 2) {
+                window.location.reload();
+            }
+        })();
+        </script>
+        <?php
+    }
+
     /**
      * Add CSS to admin menu editor
      */
